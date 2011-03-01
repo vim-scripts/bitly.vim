@@ -1,0 +1,117 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3476
+
+
+lastest version is https://github.com/basyura/bitly.vim
+
+==============================================================================
+
+CONTENTS					*bitly-contents*
+
+Introduction		|bitly-introduction|
+Install			|bitly-install|
+Variables		|bitly-variables|
+Usage			|bitly-usage|
+
+==============================================================================
+INTRODUCTION					*bitly-introduction*
+
+bitly.vim is a library of bit.ly.
+support API version 3.0
+
+  bit.ly is a utility that allows users to shorten a long URL, share it, 
+  and then track the resulting usage. (http://bit.ly/)
+
+  bit.ly exposes its data via an Application Programming Interface (API),
+  so developers can interact in a programmatic way with the bit.ly website.
+  (http://code.google.com/p/bitly-api/wiki/ApiDocumentation)
+
+bitly.vim bundles webapi-vim.
+(https://github.com/mattn/webapi-vim/)
+
+==============================================================================
+INSTALL						*bitly-install*
+
+Install the distributed files into Vim script directory which is usually
+~/.vim/, or $HOME/vimfiles on Windows.
+
+==============================================================================
+VARIABLES					*bitly-variables*
+
+g:bitly_login					*g:bitly_login*
+		bit.ly login id.
+		if you want to use your login id , set this.
+
+g:bitly_api_key					*g:bitly_api_key*
+		bit.ly api key.
+		if you want to use your api key , set this.
+
+==============================================================================
+USAGE						*bitly-usage*
+	
+shorten
+
+	this method returns a short one.
+	return is a dict that converted from xml.
+	xml format is written in api document.
+>
+	let info = bitly#shorten('http://google.com')
+	echo info.status_code "=> 200
+	echo info.status_txt  "=> OK
+	echo info.url         "=> http://bit.ly/gzJQrA
+	echo info.global_hash "=> zzzzzzz
+	echo info.long_url    "=> http://google.com
+	echo info.new_hash    "=> 1
+<
+expand
+	
+	this method returns back the target url.
+	this method returns dict or list that converted from xml.
+	xml format is written in api document.
+>
+	let expand = bitly#expand('http://bit.ly/fHgr3a')
+	call expand.status_code "=> 200
+	call expand.long_url    "=> http://basyura.org
+	call expand.short_url   "=> http://bit.ly/fHgr3a
+	
+	let expands = bitly#expand(
+		\ ['http://bit.ly/fHgr3a' , 'http://bit.ly/g2n8tN'])
+	call expands[0].status_code "=> 200
+	call expands[0].long_url    "=> http://basyura.org
+	call expands[0].short_url   "=> http://bit.ly/fHgr3a
+	call expands[1].status_code "=> 200
+	call expands[1].long_url    "=> http://google.com
+	call expands[1].short_url   "=> http://bit.ly/g2n8tN
+<
+clicks
+
+	this method returns statistics list about the clicks on that link. 
+	return is converted from xml.
+	xml format is written in api document.
+>
+	let clicks = bitly#clicks('http://bit.ly/fHgr3a')
+<
+referrers
+
+	this method returns a list of referring sites
+	for a specified bit.ly short link, 
+	and the number of clicks per referrer. 
+	return is converted from xml.
+	xml format is written in api document.
+>
+	let referrers = bitly#referrers('http://bit.ly/djZ9g4')
+	for v in referrers
+	  if has_key(v , 'referrer')
+	    echo v.referrer . ' ' . v.clicks
+	  else
+	    echo v.referrer_app . ' ' . v.clicks
+	  endif
+	endfor
+
+	for v in bitly#countries('http://bit.ly/djZ9g4')
+	  echo v.country . ' ' . v.clicks
+	endfor
+<
+
+
+
+
